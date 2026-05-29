@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baker's All-in-One Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F6F1EA;
+    --parchment: #EDE6D9;
+    --brown-dark: #2A1A0E;
+    --brown-mid: #5C3D2E;
+    --brown-warm: #8B5E3C;
+    --amber: #C4844A;
+    --amber-light: #E8C49A;
+    --amber-pale: #F5E8D5;
+    --white: #FDFAF6;
+    --border: #D9CDBF;
+    --text-muted: #8A7A6A;
+    --green: #4A7C5C;
+    --green-pale: #E8F2EC;
+    --red-pale: #FAE8E8;
+    --red: #8B3A3A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    color: var(--brown-dark);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--brown-dark);
+    color: var(--cream);
+    padding: 20px 28px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--amber-light);
+  }
+  .header-sub {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: var(--brown-mid);
+    padding: 0 28px;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 12px 18px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    opacity: 0.55;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: opacity 0.2s, border-color 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .tab:hover { opacity: 0.85; }
+  .tab.active {
+    opacity: 1;
+    border-bottom-color: var(--amber);
+    color: var(--white);
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; padding: 28px; max-width: 700px; }
+  .panel.active { display: block; }
+
+  /* ── SHARED COMPONENTS ── */
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--brown-dark);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .field-row.single { grid-template-columns: 1fr; }
+  .field-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brown-warm);
+  }
+  .field input, .field select, .field textarea {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: var(--brown-dark);
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--amber);
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .input-prefix-wrap {
+    position: relative;
+  }
+  .input-prefix-wrap .prefix {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .input-prefix-wrap input { padding-left: 22px; }
+  .input-suffix-wrap {
+    position: relative;
+  }
+  .input-suffix-wrap .suffix {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .input-suffix-wrap input { padding-right: 28px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--brown-dark);
+    color: var(--amber-light);
+  }
+  .btn-primary:hover { background: var(--brown-mid); }
+  .btn-secondary {
+    background: var(--parchment);
+    color: var(--brown-mid);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--amber-pale); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .btn-ghost:hover { background: var(--parchment); color: var(--brown-dark); }
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border: none;
+    padding: 4px 8px;
+    font-size: 18px;
+    font-weight: 300;
+    cursor: pointer;
+    border-radius: 4px;
+    line-height: 1;
+  }
+  .btn-danger:hover { background: var(--red-pale); }
+
+  .result-box {
+    background: var(--brown-dark);
+    color: var(--cream);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-top: 24px;
+  }
+  .result-box h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    margin-bottom: 14px;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .result-item label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .result-item .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--white);
+    line-height: 1;
+  }
+  .result-item .value.highlight {
+    color: var(--amber-light);
+    font-size: 32px;
+  }
+  .result-item .value.small {
+    font-size: 18px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── PRICING TAB ── */
+  .ingredient-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .ingredient-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 36px;
+    gap: 8px;
+    align-items: center;
+  }
+  .ingredient-row input {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: var(--brown-dark);
+    width: 100%;
+  }
+  .ingredient-row input:focus { outline: none; border-color: var(--amber); }
+
+  .total-ingredients {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .total-ingredients span {
+    color: var(--brown-dark);
+    font-weight: 600;
+  }
+
+  /* ── SCALING TAB ── */
+  .scale-ingredient-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .scale-ingredient-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 70px 36px;
+    gap: 8px;
+    align-items: center;
+  }
+  .scale-ingredient-row input, .scale-ingredient-row select {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 7px 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: var(--brown-dark);
+    width: 100%;
+  }
+  .scale-ingredient-row input:focus, .scale-ingredient-row select:focus { outline: none; border-color: var(--amber); }
+
+  .col-header {
+    display: grid;
+    grid-template-columns: 1fr 90px 70px 36px;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .col-header span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .scaled-results {
+    background: var(--amber-pale);
+    border: 1px solid var(--amber-light);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+  .scaled-results h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--brown-dark);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .scaled-results .multiplier-badge {
+    font-size: 11px;
+    background: var(--amber);
+    color: var(--white);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+  }
+  .scaled-list { display: flex; flex-direction: column; gap: 6px; }
+  .scaled-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(196,133,74,0.2);
+    font-size: 13px;
+  }
+  .scaled-item:last-child { border-bottom: none; }
+  .scaled-item .ingr-name { color: var(--brown-dark); }
+  .scaled-item .ingr-amount {
+    font-weight: 600;
+    color: var(--brown-warm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── SERVING SIZE GUIDE ── */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .filter-chip {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .filter-chip.active {
+    background: var(--brown-dark);
+    color: var(--amber-light);
+    border-color: var(--brown-dark);
+  }
+  .filter-chip:hover:not(.active) { background: var(--parchment); }
+
+  .serving-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .serving-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+    background: var(--parchment);
+  }
+  .serving-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--brown-dark);
+    vertical-align: top;
+  }
+  .serving-table tr:last-child td { border-bottom: none; }
+  .serving-table tr:hover td { background: var(--amber-pale); }
+  .serving-table .item-name { font-weight: 500; }
+  .serving-table .category-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .badge-cake { background: #F5E6D8; color: #8B5E3C; }
+  .badge-cookie { background: #EEF2E6; color: #5A7040; }
+  .badge-bread { background: #E8EAF5; color: #4A5080; }
+  .badge-pastry { background: #F2E8F5; color: #7A4A80; }
+  .badge-pie { background: #F5E8E8; color: #804A4A; }
+  .badge-cupcake { background: #FFF0E8; color: #8B6040; }
+
+  .note-box {
+    background: var(--amber-pale);
+    border-left: 3px solid var(--amber);
+    padding: 10px 14px;
+    border-radius: 0 4px 4px 0;
+    font-size: 12px;
+    color: var(--brown-mid);
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* ── ALLERGEN TAB ── */
+  .allergen-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .allergen-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 13px;
+    color: var(--brown-dark);
+    font-weight: 400;
+    user-select: none;
+  }
+  .allergen-chip:hover { border-color: var(--amber); background: var(--amber-pale); }
+  .allergen-chip.selected {
+    background: var(--brown-dark);
+    color: var(--amber-light);
+    border-color: var(--brown-dark);
+  }
+  .allergen-chip .allergen-icon { font-size: 16px; flex-shrink: 0; }
+  .allergen-chip .allergen-name { font-size: 12px; font-weight: 500; }
+
+  .label-preview {
+    background: var(--white);
+    border: 2px solid var(--brown-dark);
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 4px;
+  }
+  .label-preview h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--brown-dark);
+    margin-bottom: 8px;
+  }
+  .label-preview .allergen-statement {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brown-dark);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .label-preview .allergen-contains {
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+  }
+  .label-preview .allergen-free {
+    font-size: 12px;
+    color: var(--green);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .label-preview .may-contain {
+    font-size: 12px;
+    color: var(--brown-warm);
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .label-preview .additional-notes {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--brown-mid);
+  }
+  .copy-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .copy-confirmation {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .copy-confirmation.show { opacity: 1; }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .empty-state .emoji { font-size: 28px; margin-bottom: 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 500px) {
+    .panel { padding: 16px; }
+    .header { padding: 14px 16px 12px; }
+    .tabs { padding: 0 16px; }
+    .tab { padding: 10px 12px; }
+    .field-row { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr 1fr; }
+    .allergen-grid { grid-template-columns: repeat(2, 1fr); }
+    .scale-ingredient-row { grid-template-columns: 1fr 80px 60px 30px; }
+    .col-header { grid-template-columns: 1fr 80px 60px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-title">Baker's All-in-One Calculator</span>
+  <span class="header-sub">Sweet Stack</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('pricing', this)">💰 Pricing</button>
+  <button class="tab" onclick="switchTab('scaling', this)">⚖️ Recipe Scaling</button>
+  <button class="tab" onclick="switchTab('serving', this)">🍰 Serving Sizes</button>
+  <button class="tab" onclick="switchTab('allergen', this)">⚠️ Allergen Label</button>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 1: PRICING                        -->
+<!-- ══════════════════════════════════════ -->
+<div id="tab-pricing" class="panel active">
+
+  <div class="section-label">Ingredients</div>
+  <div class="ingredient-list" id="ingredient-list"></div>
+  <div class="total-ingredients" id="ingredient-total">Ingredient Total: <span>$0.00</span></div>
+  <button class="btn btn-secondary" onclick="addIngredient()" style="margin-bottom:24px">+ Add Ingredient</button>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:8px">Labor & Overhead</div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Labor Hours</label>
+      <div class="input-suffix-wrap">
+        <input type="number" id="labor-hours" placeholder="0" min="0" step="0.25" oninput="calcPricing()">
+        <span class="suffix">hrs</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Hourly Rate</label>
+      <div class="input-prefix-wrap">
+        <span class="prefix">$</span>
+        <input type="number" id="labor-rate" placeholder="20" min="0" step="0.5" oninput="calcPricing()">
+      </div>
+      <span class="hint">Minimum $15/hr. Skilled decorating: $20–$35/hr.</span>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Overhead / Batch</label>
+      <div class="input-prefix-wrap">
+        <span class="prefix">$</span>
+        <input type="number" id="overhead" placeholder="0" min="0" step="0.5" oninput="calcPricing()">
+      </div>
+      <span class="hint">Packaging, utilities, etc.</span>
+    </div>
+    <div class="field">
+      <label>Batch Yield (units)</label>
+      <input type="number" id="batch-yield" placeholder="12" min="1" step="1" oninput="calcPricing()">
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:8px">Profit Margin</div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Desired Margin</label>
+      <div class="input-suffix-wrap">
+        <input type="number" id="profit-margin" placeholder="40" min="1" max="99" step="1" oninput="calcPricing()">
+        <span class="suffix">%</span>
+      </div>
+      <span class="hint">Most bakers aim for 40–60%.</span>
+    </div>
+    <div class="field">
+      <label>Minimum Markup</label>
+      <div id="markup-display" style="padding:8px 0; font-size:13px; color:var(--text-muted)">Enter margin to see</div>
+    </div>
+  </div>
+
+  <div class="result-box" id="pricing-result">
+    <h3>Your Results</h3>
+    <div class="result-grid">
+      <div class="result-item">
+        <label>Total Batch Cost</label>
+        <div class="value small" id="res-batch-cost">—</div>
+      </div>
+      <div class="result-item">
+        <label>Cost Per Unit</label>
+        <div class="value small" id="res-cost-per-unit">—</div>
+      </div>
+      <div class="result-item">
+        <label>Suggested Price</label>
+        <div class="value highlight" id="res-suggested-price">—</div>
+      </div>
+      <div class="result-item">
+        <label>Profit Per Unit</label>
+        <div class="value small" id="res-profit-per-unit">—</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 2: RECIPE SCALING                 -->
+<!-- ══════════════════════════════════════ -->
+<div id="tab-scaling" class="panel">
+
+  <div class="section-label">Base Recipe</div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Recipe Name</label>
+      <input type="text" id="recipe-name" placeholder="e.g. Classic Chocolate Cake">
+    </div>
+    <div class="field">
+      <label>Base Servings / Units</label>
+      <input type="number" id="base-servings" placeholder="12" min="1" step="1" oninput="calcScaling()">
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-label" style="margin-top:8px">Ingredients</div>
+  <div class="col-header">
+    <span>Ingredient</span>
+    <span>Amount</span>
+    <span>Unit</span>
+    <span></span>
+  </div>
+  <div class="scale-ingredient-list" id="scale-ingredient-list"></div>
+  <button class="btn btn-secondary" onclick="addScaleIngredient()" style="margin-bottom:24px">+ Add Ingredient</button>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:8px">Scale To</div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Target Servings / Units</label>
+      <input type="number" id="target-servings" placeholder="24" min="1" step="1" oninput="calcScaling()">
+    </div>
+    <div class="field">
+      <label>— or — Multiplier</label>
+      <div class="input-suffix-wrap">
+        <input type="number" id="multiplier" placeholder="2" min="0.1" step="0.1" oninput="syncMultiplier()">
+        <span class="suffix">×</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="scaling-result"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 3: SERVING SIZE GUIDE             -->
+<!-- ══════════════════════════════════════ -->
+<div id="tab-serving" class="panel">
+
+  <div class="section-label">Standard Serving Sizes</div>
+  <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px; line-height:1.5;">
+    Reference guide for common home bakery items. Actual serving sizes may vary based on occasion and presentation.
+  </p>
+
+  <div class="filter-row" id="serving-filters"></div>
+
+  <div style="overflow-x:auto;">
+    <table class="serving-table" id="serving-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Category</th>
+          <th>Serving Size</th>
+          <th>Servings / Standard Unit</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="serving-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="note-box">
+    💡 <strong>Wedding & event cakes</strong> use smaller "event portions" — a 6" round typically serves 12 event guests vs. 8 for a regular dessert serving. Always confirm expectations with the client at booking.
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!--  TAB 4: ALLERGEN LABEL GENERATOR       -->
+<!-- ══════════════════════════════════════ -->
+<div id="tab-allergen" class="panel">
+
+  <div class="section-label">Select Allergens Present</div>
+  <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px; line-height:1.5;">
+    Click all allergens that are ingredients in this product. Based on FDA's 9 major food allergens.
+  </p>
+
+  <div class="allergen-grid" id="allergen-grid"></div>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:8px">May Contain / Cross-Contact</div>
+  <div class="allergen-grid" id="may-contain-grid"></div>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:8px">Additional Notes</div>
+  <div class="field">
+    <textarea id="allergen-notes" placeholder="e.g. Made in a facility that processes tree nuts. Certified gluten-free facility." oninput="renderLabel()"></textarea>
+  </div>
+
+  <div class="section-label" style="margin-top:24px">Label Preview</div>
+
+  <div id="label-preview-container">
+    <div class="empty-state">
+      <div class="emoji">🏷️</div>
+      Select allergens above to generate your label
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  PRICING CALCULATOR
+// ════════════════════════════════════════
+let ingredients = [
+  { name: '', cost: '' },
+  { name: '', cost: '' },
+];
+
+function renderIngredients() {
+  const list = document.getElementById('ingredient-list');
+  list.innerHTML = '';
+  ingredients.forEach((ing, i) => {
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+      <input type="text" placeholder="e.g. Butter, flour, sugar…" value="${ing.name}"
+        oninput="ingredients[${i}].name=this.value; updateIngTotal()">
+      <div class="input-prefix-wrap" style="position:relative">
+        <span class="prefix" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-muted);pointer-events:none">$</span>
+        <input type="number" placeholder="0.00" min="0" step="0.01" value="${ing.cost}"
+          style="padding-left:22px;background:var(--white);border:1px solid var(--border);border-radius:4px;padding-left:22px;padding-top:7px;padding-bottom:7px;font-family:'Jost',sans-serif;font-size:13px;color:var(--brown-dark);width:100%"
+          oninput="ingredients[${i}].cost=this.value; calcPricing()">
+      </div>
+      <button class="btn-danger" onclick="removeIngredient(${i})">×</button>
+    `;
+    list.appendChild(row);
+  });
+  updateIngTotal();
+}
+
+function addIngredient() {
+  ingredients.push({ name: '', cost: '' });
+  renderIngredients();
+}
+
+function removeIngredient(i) {
+  if (ingredients.length <= 1) return;
+  ingredients.splice(i, 1);
+  renderIngredients();
+  calcPricing();
+}
+
+function updateIngTotal() {
+  const total = ingredients.reduce((s, ing) => s + (parseFloat(ing.cost) || 0), 0);
+  document.getElementById('ingredient-total').innerHTML = `Ingredient Total: <span>$${total.toFixed(2)}</span>`;
+  calcPricing();
+}
+
+function calcPricing() {
+  const ingTotal = ingredients.reduce((s, ing) => s + (parseFloat(ing.cost) || 0), 0);
+  const laborHrs = parseFloat(document.getElementById('labor-hours').value) || 0;
+  const laborRate = parseFloat(document.getElementById('labor-rate').value) || 0;
+  const overhead = parseFloat(document.getElementById('overhead').value) || 0;
+  const batchYield = parseFloat(document.getElementById('batch-yield').value) || 1;
+  const marginPct = parseFloat(document.getElementById('profit-margin').value) || 0;
+
+  const laborCost = laborHrs * laborRate;
+  const batchCost = ingTotal + laborCost + overhead;
+  const costPerUnit = batchCost / batchYield;
+  const margin = marginPct / 100;
+  const suggestedPrice = margin > 0 && margin < 1 ? costPerUnit / (1 - margin) : costPerUnit;
+  const profitPerUnit = suggestedPrice - costPerUnit;
+
+  const markupMultiplier = costPerUnit > 0 && suggestedPrice > 0 ? (suggestedPrice / costPerUnit).toFixed(2) : '—';
+  document.getElementById('markup-display').innerHTML =
+    markupMultiplier !== '—'
+      ? `<span style="font-size:16px;font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--brown-warm)">${markupMultiplier}×</span> <span style="font-size:11px;color:var(--text-muted)">markup</span>`
+      : `<span style="color:var(--text-muted);font-size:13px">Enter margin to see</span>`;
+
+  document.getElementById('res-batch-cost').textContent = `$${batchCost.toFixed(2)}`;
+  document.getElementById('res-cost-per-unit').textContent = `$${costPerUnit.toFixed(2)}`;
+  document.getElementById('res-suggested-price').textContent = margin > 0 ? `$${suggestedPrice.toFixed(2)}` : '—';
+  document.getElementById('res-profit-per-unit').textContent = margin > 0 ? `$${profitPerUnit.toFixed(2)}` : '—';
+}
+
+// ════════════════════════════════════════
+//  RECIPE SCALING
+// ════════════════════════════════════════
+const UNITS = ['g', 'kg', 'oz', 'lb', 'tsp', 'tbsp', 'cup', 'ml', 'L', 'whole', 'each', 'pinch'];
+
+let scaleIngredients = [
+  { name: 'Flour', amount: '2', unit: 'cup' },
+  { name: 'Sugar', amount: '1', unit: 'cup' },
+  { name: 'Butter', amount: '0.5', unit: 'cup' },
+];
+
+function renderScaleIngredients() {
+  const list = document.getElementById('scale-ingredient-list');
+  list.innerHTML = '';
+  scaleIngredients.forEach((ing, i) => {
+    const row = document.createElement('div');
+    row.className = 'scale-ingredient-row';
+    const unitOptions = UNITS.map(u => `<option value="${u}" ${u === ing.unit ? 'selected' : ''}>${u}</option>`).join('');
+    row.innerHTML = `
+      <input type="text" placeholder="Ingredient name" value="${ing.name}"
+        oninput="scaleIngredients[${i}].name=this.value; calcScaling()">
+      <input type="number" placeholder="0" min="0" step="any" value="${ing.amount}"
+        oninput="scaleIngredients[${i}].amount=this.value; calcScaling()">
+      <select onchange="scaleIngredients[${i}].unit=this.value; calcScaling()">
+        ${unitOptions}
+      </select>
+      <button class="btn-danger" onclick="removeScaleIngredient(${i})">×</button>
+    `;
+    list.appendChild(row);
+  });
+  calcScaling();
+}
+
+function addScaleIngredient() {
+  scaleIngredients.push({ name: '', amount: '', unit: 'g' });
+  renderScaleIngredients();
+}
+
+function removeScaleIngredient(i) {
+  if (scaleIngredients.length <= 1) return;
+  scaleIngredients.splice(i, 1);
+  renderScaleIngredients();
+}
+
+function syncMultiplier() {
+  const base = parseFloat(document.getElementById('base-servings').value) || 0;
+  const mult = parseFloat(document.getElementById('multiplier').value) || 0;
+  if (base && mult) {
+    document.getElementById('target-servings').value = (base * mult).toFixed(0);
+  }
+  calcScaling();
+}
+
+function calcScaling() {
+  const base = parseFloat(document.getElementById('base-servings').value) || 0;
+  const target = parseFloat(document.getElementById('target-servings').value) || 0;
+  if (base && target) {
+    const mult = target / base;
+    document.getElementById('multiplier').value = mult.toFixed(2);
+    renderScaledResult(mult);
+  } else {
+    document.getElementById('scaling-result').innerHTML = '';
+  }
+}
+
+function formatAmount(val) {
+  if (val === Math.round(val)) return val.toString();
+  const fracs = [[1/8,'⅛'],[1/4,'¼'],[1/3,'⅓'],[3/8,'⅜'],[1/2,'½'],[5/8,'⅝'],[2/3,'⅔'],[3/4,'¾'],[7/8,'⅞']];
+  const whole = Math.floor(val);
+  const frac = val - whole;
+  let fracStr = '';
+  let closest = null; let closestDist = 0.1;
+  for (const [n, sym] of fracs) {
+    const d = Math.abs(frac - n);
+    if (d < closestDist) { closestDist = d; closest = sym; }
+  }
+  if (closest && frac > 0.05) fracStr = closest;
+  else if (frac > 0.05) fracStr = val.toFixed(2).replace(/\.?0+$/, '');
+  return whole ? (fracStr ? `${whole} ${fracStr}` : `${whole}`) : (fracStr || val.toFixed(2));
+}
+
+function renderScaledResult(mult) {
+  const recipeName = document.getElementById('recipe-name').value || 'Scaled Recipe';
+  const target = document.getElementById('target-servings').value;
+  const items = scaleIngredients.filter(i => i.name && i.amount);
+  if (!items.length) { document.getElementById('scaling-result').innerHTML = ''; return; }
+
+  const scaledItems = items.map(ing => ({
+    name: ing.name,
+    amount: formatAmount(parseFloat(ing.amount) * mult),
+    unit: ing.unit,
+  }));
+
+  document.getElementById('scaling-result').innerHTML = `
+    <div class="scaled-results">
+      <h4>
+        ${recipeName}
+        <span class="multiplier-badge">${mult.toFixed(2)}× — ${target} servings</span>
+      </h4>
+      <div class="scaled-list">
+        ${scaledItems.map(item => `
+          <div class="scaled-item">
+            <span class="ingr-name">${item.name}</span>
+            <span class="ingr-amount">${item.amount} ${item.unit}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════
+//  SERVING SIZE GUIDE
+// ════════════════════════════════════════
+const SERVING_DATA = [
+  { item: '6" Round Cake', cat: 'Cake', serving: '1 slice (1/8 cake)', total: '8–12 slices', notes: 'Dessert portion. Event portions: 12–16.' },
+  { item: '8" Round Cake', cat: 'Cake', serving: '1 slice (1/12 cake)', total: '12–16 slices', notes: 'Most popular size for birthdays.' },
+  { item: '9×13 Sheet Cake', cat: 'Cake', serving: '1 slice (~3"×4")', total: '24 slices', notes: 'Standard for parties and potlucks.' },
+  { item: 'Half Sheet Cake', cat: 'Cake', serving: '1 slice (~2"×3")', total: '48 slices', notes: 'Common for large events.' },
+  { item: '10" Bundt Cake', cat: 'Cake', serving: '1 slice (1/12 cake)', total: '12 slices', notes: 'May vary by density.' },
+  { item: 'Cupcake (Standard)', cat: 'Cupcake', serving: '1 cupcake', total: '12 per batch', notes: 'Approx. 2.5" diameter.' },
+  { item: 'Cupcake (Mini)', cat: 'Cupcake', serving: '2–3 minis', total: '24–36 per batch', notes: 'Good for tastings and events.' },
+  { item: 'Drop Cookies (Standard)', cat: 'Cookie', serving: '1–2 cookies', total: '24–48 per batch', notes: '3–4 oz dough balls for jumbo.' },
+  { item: 'Bars / Brownies', cat: 'Cookie', serving: '1 bar (~2"×2")', total: '16 (8×8") or 24 (9×13")', notes: 'Fudgy brownies cut smaller.' },
+  { item: 'Sandwich Cookies', cat: 'Cookie', serving: '1 cookie', total: '12–18 per batch', notes: 'Macarons, whoopie pies, etc.' },
+  { item: 'Dinner Rolls', cat: 'Bread', serving: '1 roll', total: '12 per batch', notes: '2 oz dough each.' },
+  { item: 'Sandwich Loaf', cat: 'Bread', serving: '1 slice (~½" thick)', total: '16–20 slices', notes: 'Standard 9×5" loaf.' },
+  { item: 'Banana Bread', cat: 'Bread', serving: '1 slice (½")', total: '8–10 slices', notes: '8×4" loaf standard.' },
+  { item: 'Muffins (Standard)', cat: 'Bread', serving: '1 muffin', total: '12 per batch', notes: 'Fills standard 12-cup tin.' },
+  { item: '9" Fruit Pie', cat: 'Pie', serving: '1 slice (1/8 pie)', total: '8 slices', notes: 'Standard dessert serving.' },
+  { item: 'Mini Pies (4")', cat: 'Pie', serving: '1 whole mini pie', total: '1 serving', notes: 'Great for individual portions.' },
+  { item: 'Tart (9")', cat: 'Pie', serving: '1 slice (1/8 tart)', total: '8 slices', notes: 'Thinner than pie, richer filling.' },
+  { item: 'Croissant', cat: 'Pastry', serving: '1 croissant', total: '1', notes: '3–4 oz raw dough each.' },
+  { item: 'Cinnamon Roll (Standard)', cat: 'Pastry', serving: '1 roll', total: '9–12 per batch', notes: '9×13" pan holds 9 standard rolls.' },
+  { item: 'Scone', cat: 'Pastry', serving: '1 scone', total: '8 per batch', notes: 'Cut from round disc, 8 wedges.' },
+  { item: 'Danish (Individual)', cat: 'Pastry', serving: '1 danish', total: '1', notes: 'Approx. 4–5" diameter.' },
+];
+
+let activeFilter = 'All';
+
+function initServingGuide() {
+  const cats = ['All', ...new Set(SERVING_DATA.map(d => d.cat))];
+  const filters = document.getElementById('serving-filters');
+  cats.forEach(cat => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (cat === 'All' ? ' active' : '');
+    chip.textContent = cat;
+    chip.onclick = () => {
+      activeFilter = cat;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderServingTable();
+    };
+    filters.appendChild(chip);
+  });
+  renderServingTable();
+}
+
+function renderServingTable() {
+  const filtered = activeFilter === 'All' ? SERVING_DATA : SERVING_DATA.filter(d => d.cat === activeFilter);
+  const catClass = { Cake:'badge-cake', Cookie:'badge-cookie', Bread:'badge-bread', Pastry:'badge-pastry', Pie:'badge-pie', Cupcake:'badge-cupcake' };
+  const tbody = document.getElementById('serving-tbody');
+  tbody.innerHTML = filtered.map(row => `
+    <tr>
+      <td class="item-name">${row.item}</td>
+      <td><span class="category-badge ${catClass[row.cat] || ''}">${row.cat}</span></td>
+      <td>${row.serving}</td>
+      <td>${row.total}</td>
+      <td style="color:var(--text-muted);font-size:12px">${row.notes}</td>
+    </tr>
+  `).join('');
+}
+
+// ════════════════════════════════════════
+//  ALLERGEN LABEL GENERATOR
+// ════════════════════════════════════════
+const ALLERGENS = [
+  { id: 'milk',       name: 'Milk / Dairy',  icon: '🥛' },
+  { id: 'eggs',       name: 'Eggs',           icon: '🥚' },
+  { id: 'wheat',      name: 'Wheat / Gluten', icon: '🌾' },
+  { id: 'soy',        name: 'Soy',            icon: '🫘' },
+  { id: 'peanuts',    name: 'Peanuts',        icon: '🥜' },
+  { id: 'tree_nuts',  name: 'Tree Nuts',      icon: '🌰' },
+  { id: 'fish',       name: 'Fish',           icon: '🐟' },
+  { id: 'shellfish',  name: 'Shellfish',      icon: '🦐' },
+  { id: 'sesame',     name: 'Sesame',         icon: '⚪' },
+];
+
+let selectedAllergens = new Set();
+let mayContainAllergens = new Set();
+
+function renderAllergenGrids() {
+  renderAllergenGrid('allergen-grid', selectedAllergens, (id) => {
+    if (selectedAllergens.has(id)) selectedAllergens.delete(id);
+    else selectedAllergens.add(id);
+    renderAllergenGrids();
+    renderLabel();
+  });
+  renderAllergenGrid('may-contain-grid', mayContainAllergens, (id) => {
+    if (mayContainAllergens.has(id)) mayContainAllergens.delete(id);
+    else mayContainAllergens.add(id);
+    renderAllergenGrids();
+    renderLabel();
+  });
+}
+
+function renderAllergenGrid(gridId, selectedSet, onToggle) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  ALLERGENS.forEach(a => {
+    const chip = document.createElement('div');
+    chip.className = 'allergen-chip' + (selectedSet.has(a.id) ? ' selected' : '');
+    chip.innerHTML = `<span class="allergen-icon">${a.icon}</span><span class="allergen-name">${a.name}</span>`;
+    chip.onclick = () => onToggle(a.id);
+    grid.appendChild(chip);
+  });
+}
+
+function renderLabel() {
+  const container = document.getElementById('label-preview-container');
+  const notes = document.getElementById('allergen-notes').value.trim();
+
+  if (selectedAllergens.size === 0 && mayContainAllergens.size === 0 && !notes) {
+    container.innerHTML = `<div class="empty-state"><div class="emoji">🏷️</div>Select allergens above to generate your label</div>`;
+    return;
+  }
+
+  const getName = id => ALLERGENS.find(a => a.id === id)?.name || id;
+
+  const containsList = [...selectedAllergens].map(getName);
+  const mayList = [...mayContainAllergens].filter(id => !selectedAllergens.has(id)).map(getName);
+  const freeList = ALLERGENS.filter(a => !selectedAllergens.has(a.id) && !mayContainAllergens.has(a.id)).map(a => a.name);
+
+  let containsHTML = '';
+  if (containsList.length > 0) {
+    containsHTML = `<div class="allergen-contains">Contains: ${containsList.join(', ')}</div>`;
+  }
+
+  let mayHTML = '';
+  if (mayList.length > 0) {
+    mayHTML = `<div class="may-contain">May contain traces of: ${mayList.join(', ')}</div>`;
+  }
+
+  let notesHTML = '';
+  if (notes) {
+    notesHTML = `<div class="additional-notes">${notes}</div>`;
+  }
+
+  const labelText = [
+    containsList.length > 0 ? `Contains: ${containsList.join(', ')}.` : '',
+    mayList.length > 0 ? `May contain traces of: ${mayList.join(', ')}.` : '',
+    notes,
+  ].filter(Boolean).join(' ');
+
+  container.innerHTML = `
+    <div class="label-preview">
+      <h4>Allergen Information</h4>
+      ${containsHTML}
+      ${mayHTML}
+      ${notesHTML}
+    </div>
+    <div class="copy-bar">
+      <button class="btn btn-secondary" onclick="copyLabel(\`${labelText.replace(/`/g, '\\`')}\`)">Copy Label Text</button>
+      <span class="copy-confirmation" id="copy-confirm">✓ Copied!</span>
+    </div>
+  `;
+}
+
+function copyLabel(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById('copy-confirm');
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); }
+  });
+}
+
+// ════════════════════════════════════════
+//  TAB SWITCHER
+// ════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+renderIngredients();
+renderScaleIngredients();
+initServingGuide();
+renderAllergenGrids();
+calcPricing();
+</script>
+</body>
+</html>
