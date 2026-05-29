@@ -34,15 +34,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
 .hdr-sub{font-size:13px;color:var(--muted);margin-top:2px}
 
 /* ── TABS ── */
-.tab-bar{display:flex;gap:0;padding:0 24px;margin-top:16px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tab-bar{display:flex;gap:0;padding:0 24px;margin-top:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
 .tab-bar::-webkit-scrollbar{display:none}
 .tab-btn{padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s,border-color .15s}
 .tab-btn:hover{color:var(--brown)}
 .tab-btn.on{color:var(--salmon);border-bottom-color:var(--salmon);font-weight:600}
 
 /* ── PANELS ── */
-.panel{display:none;padding:24px;max-width:680px}
-.panel.on{display:block}
+.panel{display:none;padding:20px 20px 28px;width:100%}
+.panel.on{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.span-2{grid-column:1/-1}
 
 /* ── CARDS ── */
 .card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -187,7 +188,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
 .toggle-btn.on{background:var(--white);color:var(--salmon);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
 /* ── RESPONSIVE ── */
-@media(max-width:480px){
+@media(max-width:600px){
+  .panel.on{grid-template-columns:1fr}
+  .span-2{grid-column:1}
+  #pantry-list{grid-column:1;grid-row:auto}
+
   .field-grid.cols-2,.field-grid.cols-3{grid-template-columns:1fr}
   .ingr-row{grid-template-columns:1fr 110px 30px}
   .scale-cols,.scale-row{grid-template-columns:1fr 80px 64px 30px}
@@ -200,10 +205,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
 </head>
 <body>
 
-<div class="hdr">
-  <div class="hdr-title">Baker's All-in-One Calculator</div>
-  <div class="hdr-sub">Sweet Stack — Stop guessing. Start pricing with confidence.</div>
-</div>
 
 <div class="tab-bar">
   <button class="tab-btn on" onclick="switchTab('pricing',this)">💰 Pricing</button>
@@ -217,7 +218,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
 <!-- ═══════════════════════════════════ PRICING ═══════════════════════════════════ -->
 <div id="tab-pricing" class="panel on">
 
-  <div class="card">
+  <div class="card span-2">
     <div class="card-title">Ingredients</div>
     <div class="ingr-list" id="ingr-list"></div>
     <div class="ingr-total" id="ingr-total">Ingredient total: <strong>$0.00</strong></div>
@@ -265,7 +266,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
     </div>
   </div>
 
-  <div class="result-card">
+  <div class="result-card span-2">
     <h3>Your Results</h3>
     <div class="result-row"><span class="lbl">Ingredient cost</span><span class="val" id="r-ingr">—</span></div>
     <div class="result-row"><span class="lbl">Labor cost</span><span class="val" id="r-labor">—</span></div>
@@ -284,7 +285,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
 <!-- ═══════════════════════════════════ SCALING ═══════════════════════════════════ -->
 <div id="tab-scaling" class="panel">
 
-  <div class="card">
+  <div class="card span-2">
     <div class="card-title">Base Recipe</div>
     <div class="field-grid cols-2">
       <div class="field">
@@ -305,7 +306,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
     <button class="btn btn-secondary" onclick="addScaleIngr()">+ Add ingredient</button>
   </div>
 
-  <div class="card">
+  <div class="card span-2">
     <div class="card-title">Scale To</div>
     <div class="field-grid cols-2">
       <div class="field">
@@ -319,20 +320,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
     </div>
   </div>
 
-  <div id="scale-out"></div>
+  <div id="scale-out" class="span-2"></div>
 
 </div>
 
 <!-- ═══════════════════════════════════ SERVING ═══════════════════════════════════ -->
 <div id="tab-serving" class="panel">
 
-  <div class="toggle-group">
+  <div class="toggle-group span-2">
     <button class="toggle-btn on" onclick="servMode('calc',this)">🎂 Serving Calculator</button>
     <button class="toggle-btn" onclick="servMode('guide',this)">📋 Size Guide</button>
   </div>
 
   <!-- CALCULATOR MODE -->
-  <div id="serv-calc">
+  <div id="serv-calc" class="span-2">
     <div class="card">
       <div class="card-title">What do you want to figure out?</div>
       <div class="toggle-group">
@@ -386,7 +387,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
   </div>
 
   <!-- GUIDE MODE -->
-  <div id="serv-guide" style="display:none">
+  <div id="serv-guide" class="span-2" style="display:none">
     <div class="filter-row" id="fchips"></div>
     <div class="serving-table-wrap">
       <table class="serving-table">
@@ -501,7 +502,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
     <button class="btn btn-primary" onclick="addIngredientCost()" style="margin-top:4px">Add to Pantry</button>
   </div>
 
-  <div id="pantry-list">
+  <div id="pantry-list" style="grid-column:2;grid-row:1">
     <div class="empty"><div class="ei">🧂</div>Add ingredients above to see cost per unit</div>
   </div>
 
@@ -522,14 +523,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--brown);fo
     <div class="allergen-grid" id="ag-may"></div>
   </div>
 
-  <div class="card">
+  <div class="card span-2">
     <div class="card-title">Additional Notes</div>
     <div class="field">
       <textarea id="al-notes" placeholder="e.g. Made in a facility that also processes peanuts." oninput="renderLabel()"></textarea>
     </div>
   </div>
 
-  <div class="card">
+  <div class="card span-2">
     <div class="card-title">Label Preview</div>
     <div id="al-preview">
       <div class="empty"><div class="ei">🏷️</div>Select allergens above to generate your label</div>
@@ -1038,5 +1039,11 @@ initGuide();
 renderAllergenGrids();
 calcPricing();
 </script>
+
+<div style="grid-column:1/-1;text-align:center;padding:20px 0 8px;border-top:1px solid var(--border);margin-top:8px">
+  <div style="font-size:15px;font-weight:700;color:var(--salmon);letter-spacing:-0.01em">Baker's All-in-One Calculator</div>
+  <div style="font-size:12px;color:var(--muted);margin-top:2px">Sweet Stack — Stop guessing. Start pricing with confidence.</div>
+</div>
+
 </body>
 </html>
