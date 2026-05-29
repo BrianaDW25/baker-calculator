@@ -595,8 +595,9 @@ function removeIngr(i) { if(ingrs.length>1){ingrs.splice(i,1); renderIngrs();} }
 
 function calcPricing() {
   const ingrTotal = ingrs.reduce((s,x)=>s+(parseFloat(x.cost)||0),0);
-  document.getElementById('ingr-total').innerHTML = `Ingredient total: <strong>$${ingrTotal.toFixed(2)}</strong>`;
-  const hrs = parseFloat(document.getElementById('p-hrs').value)||0;
+  const hasIngr = ingrTotal > 0;
+  document.getElementById('ingr-total').innerHTML = hasIngr ? `Ingredient total: <strong>$${ingrTotal.toFixed(2)}</strong>` : `Ingredient total: <strong>—</strong>`;
+  const hrs  = parseFloat(document.getElementById('p-hrs').value)||0;
   const rate = parseFloat(document.getElementById('p-rate').value)||0;
   const ovhd = parseFloat(document.getElementById('p-overhead').value)||0;
   const yld  = parseFloat(document.getElementById('p-yield').value)||1;
@@ -608,11 +609,12 @@ function calcPricing() {
   const price  = margin > 0 && margin < 1 ? cpu / (1 - margin) : 0;
   const ppu    = price - cpu;
   const mult   = cpu > 0 && price > 0 ? (price/cpu).toFixed(2) : null;
-  document.getElementById('r-ingr').textContent  = `$${ingrTotal.toFixed(2)}`;
-  document.getElementById('r-labor').textContent = `$${labor.toFixed(2)}`;
-  document.getElementById('r-ovhd').textContent  = `$${ovhd.toFixed(2)}`;
-  document.getElementById('r-batch').textContent = `$${batch.toFixed(2)}`;
-  document.getElementById('r-cpu').textContent   = `$${cpu.toFixed(2)}`;
+  const hasData = batch > 0;
+  document.getElementById('r-ingr').textContent  = hasData ? `$${ingrTotal.toFixed(2)}` : '—';
+  document.getElementById('r-labor').textContent = hasData ? `$${labor.toFixed(2)}` : '—';
+  document.getElementById('r-ovhd').textContent  = hasData ? `$${ovhd.toFixed(2)}` : '—';
+  document.getElementById('r-batch').textContent = hasData ? `$${batch.toFixed(2)}` : '—';
+  document.getElementById('r-cpu').textContent   = hasData ? `$${cpu.toFixed(2)}` : '—';
   document.getElementById('r-ppu').textContent   = price ? `$${ppu.toFixed(2)}` : '—';
   document.getElementById('r-price').textContent = price ? `$${price.toFixed(2)}` : '—';
   document.getElementById('p-markup').textContent = mult ? `${mult}× markup` : '—';
